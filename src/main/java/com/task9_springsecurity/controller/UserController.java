@@ -6,8 +6,6 @@ import com.task9_springsecurity.dao.UserDao;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,7 +37,7 @@ public class UserController {
         return "users/form";
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public String listUsers(Model model, Authentication authentication) {
         User loggedUser = userService.findByEmail(authentication.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -57,7 +55,7 @@ public class UserController {
 
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes, Authentication authentication) {
+    public String showEditForm(@PathVariable Long id, Model model) {
         User user = userService.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
         model.addAttribute("user", user);
