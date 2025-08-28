@@ -1,6 +1,5 @@
 package com.task9_springsecurity.config;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -28,9 +27,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // Redirect sesuai role
         if (isAdmin) {
-            response.sendRedirect(request.getContextPath() + "/admin");
+            response.sendRedirect(request.getContextPath() + "/users");
         } else {
-            response.sendRedirect(request.getContextPath() + "/user");
+            response.sendRedirect(request.getContextPath() + "/users");
         }
     }
 }

@@ -2,7 +2,6 @@ package com.task9_springsecurity.controller;
 
 import com.task9_springsecurity.service.UserService;
 import com.task9_springsecurity.model.User;
-import com.task9_springsecurity.dao.UserDao;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -12,10 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 
 @Controller
@@ -23,8 +19,6 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-    @Autowired
-    private UserDao userDao;
 
     @Autowired
     public UserController(UserService userService) {
@@ -42,12 +36,13 @@ public class UserController {
         User loggedUser = userService.findByEmail(authentication.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // kalau role USER, hanya tampilkan data sendiri
-        if (loggedUser.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_USER"))) {
-            model.addAttribute("users", List.of(loggedUser));
+        boolean isAdmin = loggedUser.getRoles().stream()
+                .anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            model.addAttribute("users", userService.findAll()); // semua user
         } else {
-            // kalau ADMIN, tampilkan semua
-            model.addAttribute("users", userService.findAll());
+            model.addAttribute("users", List.of(loggedUser)); // cuma user sendiri
         }
 
         return "users/list";
@@ -100,10 +95,9 @@ public class UserController {
 
     @GetMapping("/user")
     public String userHome(Model model, Authentication auth) {
-        Optional<User> currentUserOpt = userDao.findByEmail(auth.getName());
-        User currentUser = currentUserOpt.orElse(null); // kalau ga ketemu → null
-        List<User> users = currentUser != null ? List.of(currentUser) : Collections.emptyList();
-        model.addAttribute("users", users);
+        User loggedUser = userService.findByEmail(auth.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        model.addAttribute("users", List.of(loggedUser));
         return "users/list";
     }
 }

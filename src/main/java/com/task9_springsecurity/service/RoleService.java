@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface RoleService {
     List<Role> findAll();
     Optional<Role> findById(Long id);
-    void save(Role role);
-    void update(Role role);
-    void delete(Long id);
+    Optional<Role> findByName(String name);
+    Role save(Role role);
+    void deleteById(Long id);
 }

@@ -1,38 +1,44 @@
 package com.task9_springsecurity.service;
 
-import com.task9_springsecurity.dao.RoleDao;
+import com.task9_springsecurity.dao.RoleRepository;
 import com.task9_springsecurity.model.Role;
-import com.task9_springsecurity.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    private final RoleDao roleDao;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    public RoleServiceImpl(RoleDao roleDao) { this.roleDao = roleDao; }
+    public RoleServiceImpl(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
 
     @Override
-    public List<Role> findAll() { return roleDao.findAll(); }
+    public List<Role> findAll() {
+        return roleRepository.findAll();
+    }
 
     @Override
-    public Optional<Role> findById(Long id) { return roleDao.findById(id); }
+    public Optional<Role> findById(Long id) {
+        return roleRepository.findById(id);
+    }
 
     @Override
-    @Transactional
-    public void save(Role role) { roleDao.save(role); }
+    public Optional<Role> findByName(String name) {
+        return roleRepository.findByName(name);
+    }
 
     @Override
-    @Transactional
-    public void update(Role role) { roleDao.update(role); }
+    public Role save(Role role) {
+        return roleRepository.save(role);
+    }
 
     @Override
-    @Transactional
-    public void delete(Long id) { roleDao.delete(id); }
+    public void deleteById(Long id) {
+        roleRepository.deleteById(id);
+    }
 }
