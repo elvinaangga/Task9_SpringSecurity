@@ -1,4 +1,4 @@
-package com.task9_springsecurity.dao;
+package com.task9_springsecurity.repository;
 
 import com.task9_springsecurity.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

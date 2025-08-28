@@ -1,6 +1,6 @@
 package com.task9_springsecurity.service;
 
-import com.task9_springsecurity.dao.UserRepository;
+import com.task9_springsecurity.repository.UserRepository;
 import com.task9_springsecurity.model.User;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
