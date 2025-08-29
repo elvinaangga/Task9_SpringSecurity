@@ -1,6 +1,5 @@
 package com.task9_springsecurity.config;
 
-import com.task9_springsecurity.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,12 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private final UserService userService;
     private final LoginSuccessHandler loginSuccessHandler;
 
     @Autowired
-    public WebSecurityConfig(UserService userService, LoginSuccessHandler loginSuccessHandler) {
-        this.userService = userService;
+    public WebSecurityConfig(LoginSuccessHandler loginSuccessHandler) {
         this.loginSuccessHandler = loginSuccessHandler;
     }
 
@@ -31,7 +28,6 @@ public class WebSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-// jangan pake yg noOp itu, gabisa dipake zz
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -42,7 +38,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/users/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )

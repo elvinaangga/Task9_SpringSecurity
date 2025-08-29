@@ -27,9 +27,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // Redirect sesuai role
         if (isAdmin) {
-            response.sendRedirect(request.getContextPath() + "/users");
+            response.sendRedirect("/users"); // langsung redirect, jangan panggil service
         } else {
-            response.sendRedirect(request.getContextPath() + "/users");
+            response.sendRedirect("/user"); // langsung redirect
         }
     }
 }

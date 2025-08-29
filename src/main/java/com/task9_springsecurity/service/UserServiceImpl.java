@@ -6,9 +6,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,25 +15,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final Validator validator;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, Validator validator) {
+    public UserServiceImpl(UserRepository userRepository, Validator validator, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.validator = validator;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("Login attempt with email: " + email);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-
-        System.out.println("Found user: " + user.getEmail() + ", password: " + user.getPassword());
-        return user;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -57,6 +47,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public void save(User user) {
         validateUser(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -64,6 +55,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public void update(User user) {
         validateUser(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user); // JPA save() bisa handle update juga
     }
 
