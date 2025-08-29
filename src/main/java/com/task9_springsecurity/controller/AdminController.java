@@ -63,14 +63,16 @@ public class AdminController {
                              BindingResult result,
                              RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            // ada error validasi → kembali ke form
+            System.out.println("Validation errors: " + result.getAllErrors());
             return "users/form";
         }
-        // tidak ada error → simpan user
+        System.out.println("Saving user: " + user.getEmail());
         userService.save(user);
+        System.out.println("Saved successfully!");
         redirectAttributes.addFlashAttribute("successMessage", "User saved successfully!");
         return "redirect:/users";
     }
+
 
     @PostMapping("/update")
     public String updateUser(@Valid @ModelAttribute("user") User user,
