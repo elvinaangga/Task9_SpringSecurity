@@ -70,7 +70,7 @@ public class AdminController {
         userService.save(user);
         System.out.println("Saved successfully!");
         redirectAttributes.addFlashAttribute("successMessage", "User saved successfully!");
-        return "redirect:/users";
+        return "redirect:/admin";
     }
 
 
@@ -84,13 +84,13 @@ public class AdminController {
 
         userService.update(user); // service update, jangan save lagi
         redirectAttributes.addFlashAttribute("successMessage", "User updated successfully!");
-        return "redirect:/users";
+        return "redirect:/admin";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.delete(id);
         redirectAttributes.addFlashAttribute("successMessage", "User deleted successfully!");
-        return "redirect:/users";
+        return "redirect:/admin";
     }
 }
