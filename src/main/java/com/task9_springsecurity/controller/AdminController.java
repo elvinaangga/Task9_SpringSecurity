@@ -69,6 +69,7 @@ public class AdminController {
         User user = userService.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
         model.addAttribute("user", user);
+        model.addAttribute("allRoles", roleRepository.findAll());
         return "users/edit_form";
     }
 
