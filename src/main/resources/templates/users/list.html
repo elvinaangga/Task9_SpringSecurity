@@ -142,6 +142,10 @@
            th:href="@{/admin/new}" class="btn btn-primary">Add New User</a>
     </header>
 
+    <form th:action="@{/logout}" method="post" class="m-0">
+        <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+    </form>
+
     <div class="alert alert-success" id="successAlert">
         User created successfully!
     </div>
@@ -169,7 +173,7 @@
             </td>
             <td>
                 <!-- Tombol Edit -->
-                <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or user.id == #authentication.principal.id}"
+                <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                    th:href="@{/admin/edit/{id}(id=${user.id})}" class="btn-edit">Edit</a>
 
                 <!-- Tombol Delete hanya untuk ADMIN -->
