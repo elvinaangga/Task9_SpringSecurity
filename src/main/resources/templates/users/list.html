@@ -153,7 +153,8 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
-            <th>Actions</th>
+            <th>Role</th>
+            <th th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -163,6 +164,9 @@
             <td th:text="${user.firstName}"></td>
             <td th:text="${user.lastName}"></td>
             <td th:text="${user.email}"></td>
+            <td>
+                <span th:each="role, iterStat : ${user.roles}" th:text="${iterStat.last} ? ${role.name} : ${role.name + ', '}"></span>
+            </td>
             <td>
                 <!-- Tombol Edit -->
                 <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or user.id == #authentication.principal.id}"

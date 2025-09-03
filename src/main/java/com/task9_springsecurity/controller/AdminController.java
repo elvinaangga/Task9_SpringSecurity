@@ -1,6 +1,8 @@
 package com.task9_springsecurity.controller;
 
+import com.task9_springsecurity.model.Role;
 import com.task9_springsecurity.model.User;
+import com.task9_springsecurity.repository.RoleRepository;
 import com.task9_springsecurity.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Controller
@@ -20,15 +24,18 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, RoleRepository roleRepository) {
         this.userService = userService;
+        this.roleRepository = roleRepository;
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("user", new User());
+        model.addAttribute("allRoles", roleRepository.findAll());
         return "users/form";
     }
 
@@ -41,7 +48,14 @@ public class AdminController {
                 .anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
 
         if (isAdmin) {
-            model.addAttribute("users", userService.findAll()); // semua user
+            List<User> users = userService.findAll();
+            List<Role> allRoles = roleRepository.findAll();
+
+            model.addAttribute("users", users);
+            model.addAttribute("pageTitle", "Admin Panel");
+            model.addAttribute("tableTitle", "All Users");
+            model.addAttribute("user", new User());  // untuk modal create
+            model.addAttribute("allRoles", allRoles); // semua user
         } else {
             model.addAttribute("users", List.of(loggedUser)); // cuma user sendiri
         }
@@ -61,14 +75,16 @@ public class AdminController {
     @PostMapping
     public String createUser(@Valid @ModelAttribute("user") User user,
                              BindingResult result,
+                             @RequestParam("roleIds")  List<Long> roleIds,
                              RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             System.out.println("Validation errors: " + result.getAllErrors());
-            return "users/form";
+            return "redirect:/admin";
         }
-        System.out.println("Saving user: " + user.getEmail());
+        List<Role> selectedRoles = roleRepository.findAllById(roleIds);
+        user.setRoles(new HashSet<>(selectedRoles));
         userService.save(user);
-        System.out.println("Saved successfully!");
+
         redirectAttributes.addFlashAttribute("successMessage", "User saved successfully!");
         return "redirect:/admin";
     }
@@ -76,13 +92,22 @@ public class AdminController {
 
     @PostMapping("/update")
     public String updateUser(@Valid @ModelAttribute("user") User user,
+                             @RequestParam(value = "roleIds", required = false) List<Long> roleIds,
                              BindingResult result,
                              RedirectAttributes redirectAttributes) {
+
         if (result.hasErrors()) {
-            return "users/edit_form"; // balik ke edit form kalau ada error
+            return "users/edit_form";
         }
 
-        userService.update(user); // service update, jangan save lagi
+        if (roleIds != null) {
+            Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds));
+            user.setRoles(roles);
+        } else {
+            user.setRoles(new HashSet<>());
+        }
+
+        userService.update(user);
         redirectAttributes.addFlashAttribute("successMessage", "User updated successfully!");
         return "redirect:/admin";
     }
